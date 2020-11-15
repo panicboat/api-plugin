@@ -1,4 +1,4 @@
-# api-plugin
+# api-engine
 Short description and motivation.
 
 ## Usage
@@ -12,7 +12,7 @@ gem 'panicboat', path: '/panicboat'
 ```
 or
 ```ruby
-gem 'panicboat', git: 'https://github.com/panicboat/api-plugin'
+gem 'panicboat', git: 'https://github.com/panicboat/api-engine'
 ```
 
 And then execute:
