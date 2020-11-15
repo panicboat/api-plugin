@@ -25,9 +25,9 @@ module Panicboat
       session = SessionManager.new(request.headers)
       token = session.token('x-pnb-oidc-accesstoken')
       data = session.data('x-pnb-oidc-data')
-      ctx.merge({ headers: request.headers })
-      ctx.merge({ sessions: { 'x-pnb-oidc-accesstoken': token, 'x-pnb-oidc-data': data } })
-      ctx.merge({ current_user: userdata(data) })
+      ctx.merge!({ headers: request.headers })
+      ctx.merge!({ sessions: { 'x-pnb-oidc-accesstoken': token, 'x-pnb-oidc-data': data } })
+      ctx.merge!({ current_user: 'iiiiiii' })
     end
   end
 end
