@@ -1,6 +1,10 @@
-class Abstract::Operation < Trailblazer::Operation
+class Panicboat::Operation < Trailblazer::Operation
   def contract(ctx)
     ctx[:"contract.default"]
+  end
+
+  def permit!(ctx, **)
+    Rails.logger.info ctx[:action]
   end
 
   def uuid!(ctx, model:, **)

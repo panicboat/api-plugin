@@ -1,4 +1,4 @@
-class Abstract::Contract < Reform::Form
+class Panicboat::Contract < Reform::Form
   property :limit,    virtual: true
   property :offset,   virtual: true
   property :order,    virtual: true
