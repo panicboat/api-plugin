@@ -4,7 +4,7 @@ class Panicboat::Operation < Trailblazer::Operation
   end
 
   def permit!(ctx, **)
-    Rails.logger.info ctx[:action]
+    raise NotImplementedError
   end
 
   def uuid!(ctx, model:, **)
