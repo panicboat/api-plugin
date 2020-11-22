@@ -1,6 +1,6 @@
 module Panicboat
   class AbstractController < ApplicationController
-    def userdata(data)
+    def _userdata(data)
       return nil if data.blank?
 
       req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], request.headers)

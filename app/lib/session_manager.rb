@@ -24,7 +24,7 @@ class SessionManager
     response = ::Net::HTTP.get_response(::URI.parse(uri))
     jwks = ::JSON.parse(response.body)
     payload = ::JWT.decode(jwt, nil, false)
-    return false if payload[0]['iss'] != "https://cognito-idp.#{ENV['AWS_DEFAULT_REGION']}.amazonaws.com/#{ENV['AWS_COGNITO_USERPOOL_ID']}"
+    return nil if payload[0]['iss'] != "https://cognito-idp.#{ENV['AWS_DEFAULT_REGION']}.amazonaws.com/#{ENV['AWS_COGNITO_USERPOOL_ID']}"
     kid = payload[1]['kid']
     case payload[0]['token_use']
     when 'id' then
@@ -33,7 +33,7 @@ class SessionManager
       sequence = ::OpenSSL::ASN1::Sequence.new([::OpenSSL::ASN1::Integer.new(modulus), ::OpenSSL::ASN1::Integer.new(exponent)])
       ::JWT.decode jwt, ::OpenSSL::PKey::RSA.new(sequence.to_der), true, algorithm: payload[1]['alg']
     when 'access' then
-      return false if ::Time.zone.now.to_i > payload[0]['exp']
+      return nil if ::Time.zone.now.to_i > payload[0]['exp']
       payload
     end
   end
