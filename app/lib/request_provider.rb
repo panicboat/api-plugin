@@ -2,7 +2,6 @@ class RequestProvider
   def initialize(url, headers = {})
     @connection = ::Faraday.new(url: url) do |builder|
       builder.use Faraday::Request::UrlEncoded
-      builder.use Faraday::Response::Logger
     end
     @headers = headers
   end
@@ -41,7 +40,7 @@ class RequestProvider
 
   def ready_for_request(req, params)
     headers.sort.map do |k, v|
-      req.headers[k] = v
+      req.headers[k] = v if k.start_with?(/HTTP_X_/)
     end
     req.headers['Content-Type'] = 'application/json'
     req.body = params.to_json
@@ -52,7 +51,6 @@ class RequestProvider
     if response.status != Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
       Rails.logger.warn '===== HTTP REQUEST ERROR ====='
       Rails.logger.warn response.body
-      model
     end
     clazz.present? ? OpenStruct.new(JSON.parse(clazz.new(model).to_json)) : model
   end
