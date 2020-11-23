@@ -7,9 +7,10 @@ class Panicboat::Operation < Trailblazer::Operation
     return [] if ctx[:current_user].blank?
 
     req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], ctx[:headers])
-    @permissions = req.get("/permissions/#{ctx[:action]}", {}).Permissions
-
+    permissions = req.get("/permissions/#{ctx[:action]}", {}).Permissions
     raise ::InvalidPermissions, ["Permissions #{I18n.t('errors.messages.invalid')}"] if permissions.blank?
+
+    ctx[:permissions] = permissions
   end
 
   def uuid!(ctx, model:, **)
@@ -21,8 +22,4 @@ class Panicboat::Operation < Trailblazer::Operation
 
     raise ::InvalidParameters, ctx[:"contract.default"].errors.full_messages
   end
-
-  private
-
-  attr_reader :permissions
 end
