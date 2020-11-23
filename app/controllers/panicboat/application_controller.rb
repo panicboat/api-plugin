@@ -23,13 +23,14 @@ module Panicboat
     end
 
     def _run_options(ctx)
+      headers = RequestHeader.new(request.headers)
       session = SessionManager.new(request.headers)
-      token = session.token('x-pnb-oidc-accesstoken')
-      data = session.data('x-pnb-oidc-data')
-      ctx.merge!({ request: request })
+      token = session.token(RequestHeader::ACCESS_TOKEN)
+      data = session.data(RequestHeader::USER_CLAIMS)
+      ctx.merge!({ headers: headers })
       ctx.merge!({ action: "#{ENV['MY_SERVICE_NAME']}:#{_action}" })
-      ctx.merge!({ sessions: { 'x-pnb-oidc-accesstoken': token, 'x-pnb-oidc-data': data } })
-      ctx.merge!({ current_user: _userdata(data) })
+      ctx.merge!({ sessions: { "#{RequestHeader::ACCESS_TOKEN}": token, "#{RequestHeader::USER_CLAIMS}": data } })
+      ctx.merge!({ current_user: _userdata(data, headers) })
     end
 
     def _action
@@ -43,7 +44,7 @@ module Panicboat
       end
     end
 
-    def _userdata(data)
+    def _userdata(data, headers)
       raise NotImplementedError
     end
   end

@@ -1,13 +1,13 @@
 module Panicboat
   class AbstractController < ApplicationController
-    def _userdata(data)
+    def _userdata(data, headers)
       return nil if data.blank?
 
-      req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], request.headers)
-      users = req.get('/users', { email: data[0]['email'] }).Users
+      req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], headers)
+      users = req.get('/users', { email: data.first['email'] }).Users
       return nil if users.blank?
 
-      users[0]
+      users.first
     end
   end
 end

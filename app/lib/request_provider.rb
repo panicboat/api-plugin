@@ -1,9 +1,9 @@
 class RequestProvider
-  def initialize(url, headers = {})
+  def initialize(url, headers = nil)
     @connection = ::Faraday.new(url: url) do |builder|
       builder.use Faraday::Request::UrlEncoded
     end
-    @headers = headers
+    @headers = headers.present? ? headers.authorization : []
   end
 
   def get(path, params, representer = nil)
@@ -40,7 +40,7 @@ class RequestProvider
 
   def ready_for_request(req, params)
     headers.sort.map do |k, v|
-      req.headers[k] = v if k.start_with?(/HTTP_X_/)
+      req.headers[k] = v
     end
     req.headers['Content-Type'] = 'application/json'
     req.body = params.to_json

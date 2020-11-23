@@ -1,3 +1,5 @@
+require 'net/http'
+
 class SessionManager
   def initialize(headers)
     @headers = headers
@@ -24,6 +26,7 @@ class SessionManager
     response = ::Net::HTTP.get_response(::URI.parse(uri))
     jwks = ::JSON.parse(response.body)
     payload = ::JWT.decode(jwt, nil, false)
+    return payload if Rails.env.development? # TODO: I want to optimize...
     return nil if payload[0]['iss'] != "https://cognito-idp.#{ENV['AWS_DEFAULT_REGION']}.amazonaws.com/#{ENV['AWS_COGNITO_USERPOOL_ID']}"
     kid = payload[1]['kid']
     case payload[0]['token_use']
