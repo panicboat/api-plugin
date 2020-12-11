@@ -21,6 +21,8 @@ module Panicboat
     end
 
     def _session(headers)
+      return nil if headers.authorization[RequestHeader::USER_CLAIMS].blank?
+
       req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], headers)
       payload = req.get('/tokens', {}).Payload.with_indifferent_access
       data = payload[RequestHeader::USER_CLAIMS]
