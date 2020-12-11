@@ -1,10 +1,32 @@
 module Panicboat
   class AbstractController < ApplicationController
-    def _userdata(data, headers)
+    private
+
+    def _run_options(ctx)
+      headers = RequestHeader.new(request.headers)
+      ctx.merge!({ headers: headers })
+      ctx.merge!({ action: "#{ENV['AWS_ECS_SERVICE']}:#{_action}" })
+      ctx.merge!({ current_user: _session(headers) })
+    end
+
+    def _action
+      controller = request.controller_class.to_s.gsub(/Controller$/, '').singularize
+      action = request.path_parameters[:action]
+      case action
+      when 'destroy' then "Delete#{controller.capitalize}"
+      when 'index' then "List#{controller.capitalize}"
+      when 'show' then "Get#{controller.capitalize}"
+      else "#{action.capitalize}#{controller.capitalize}"
+      end
+    end
+
+    def _session(headers)
+      req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], headers)
+      payload = req.get('/tokens', {}).Payload.with_indifferent_access
+      data = payload[RequestHeader::USER_CLAIMS]
       return nil if data.blank?
 
-      req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], headers)
-      users = req.get('/users', { email: data.first['email'] }).Users
+      users = req.get('/users', { email: data.first[:email] }).Users
       return nil if users.blank?
 
       users.first
