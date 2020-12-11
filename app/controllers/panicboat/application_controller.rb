@@ -28,7 +28,7 @@ module Panicboat
       token = session.token(RequestHeader::ACCESS_TOKEN)
       data = session.data(RequestHeader::USER_CLAIMS)
       ctx.merge!({ headers: headers })
-      ctx.merge!({ action: "#{ENV['MY_SERVICE_NAME']}:#{_action}" })
+      ctx.merge!({ action: "#{ENV['AWS_ECS_SERVICE']}:#{_action}" })
       ctx.merge!({ sessions: { "#{RequestHeader::ACCESS_TOKEN}": token, "#{RequestHeader::USER_CLAIMS}": data } })
       ctx.merge!({ current_user: _userdata(data, headers) })
     end
