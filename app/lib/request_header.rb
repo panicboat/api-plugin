@@ -14,7 +14,7 @@ class RequestHeader
   def authorization
     headers = {}
     keys.each { |x| headers[x.to_sym] = origin[x.to_sym] }
-    headers
+    headers.with_indifferent_access
   end
 
   private
