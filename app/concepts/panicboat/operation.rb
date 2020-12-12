@@ -19,26 +19,29 @@ class Panicboat::Operation < Trailblazer::Operation
     ctx[:permissions] = permissions
   end
 
-  def filter(ctx, resource, model, key)
-    instance = model.where('1=1')
+  def filter(ctx, model, key)
+    condition = model.where('1=1')
     ctx[:permissions].each do |permission|
-      instance = _filter(permission, resource, model, instance, key)
+      condition = _filter(permission, model, condition, key) if permission.effect == 'allow'
     end
-    instance
+    ctx[:permissions].each do |permission|
+      condition = _filter(permission, model, condition, key) if permission.effect == 'deny'
+    end
+    condition
   end
 
   private
 
-  def _filter(permission, resource, model, instance, key)
+  def _filter(permission, model, condition, key)
     permission.prn.each do |prn|
       search = prn.gsub(/\*/, '%')
-      case permission.effect
-      when 'allow'
-        instance = instance.or(model.where("CONCAT(\"#{resource}/\", #{key}) LIKE ?", search))
-      when 'deny'
-        instance = instance.where.not("#{key} LIKE ?", search)
-      end
+      sql = "CONCAT(\"prn:panicboat:#{ENV['AWS_ECS_CLUSTER_NAME']}:#{ENV['AWS_ECS_SERVICE_NAME']}:/\", #{key}) LIKE ?"
+      condition = if permission.effect == 'allow'
+                    condition.or(model.where(sql, search))
+                  else
+                    condition.where.not(sql, search)
+                  end
     end
-    instance
+    condition
   end
 end
