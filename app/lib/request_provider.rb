@@ -47,10 +47,13 @@ class RequestProvider
   end
 
   def represent(response, clazz)
-    model = OpenStruct.new(JSON.parse(response.body))
     throw(response) if response.status != Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
-
-    clazz.present? ? OpenStruct.new(JSON.parse(clazz.new(model).to_json)) : model
+    if clazz.present?
+      model = OpenStruct.new(JSON.parse(response.body))
+      OpenStruct.new(JSON.parse(clazz.new(model).to_json))
+    else
+      JSON.parse(response.body, object_class: OpenStruct)
+    end
   end
 
   def throw(response)

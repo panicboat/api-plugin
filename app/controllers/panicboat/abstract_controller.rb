@@ -24,11 +24,10 @@ module Panicboat
       return nil if headers.authorization[::RequestHeader::USER_CLAIMS].blank?
 
       req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], headers)
-      payload = req.get('/tokens', {}).Payload.with_indifferent_access
-      data = payload[::RequestHeader::USER_CLAIMS]
-      return nil if data.blank?
+      payload = req.get('/tokens', {}).Payload
+      return nil if payload.claims.blank?
 
-      users = req.get('/users', { email: data.first[:email] }).Users
+      users = req.get('/users', { email: payload.claims.first.email }).Users
       return nil if users.blank?
 
       users.first
