@@ -48,10 +48,13 @@ class RequestProvider
 
   def represent(response, clazz)
     model = OpenStruct.new(JSON.parse(response.body))
-    if response.status != Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
-      Rails.logger.warn '===== HTTP REQUEST ERROR ====='
-      raise ::HttpRequestError, { method: response.env.method, body: response.env.request_body, url: response.env.url }
-    end
+    throw(response) if response.status != Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok]
+
     clazz.present? ? OpenStruct.new(JSON.parse(clazz.new(model).to_json)) : model
+  end
+
+  def throw(response)
+    Rails.logger.warn '===== HTTP REQUEST ERROR ====='
+    raise ::HttpRequestError, { method: response.env.method, body: response.env.request_body, url: response.env.url }
   end
 end
