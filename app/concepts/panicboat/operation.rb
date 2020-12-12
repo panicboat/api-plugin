@@ -1,8 +1,4 @@
 class Panicboat::Operation < Trailblazer::Operation
-  def contract(ctx)
-    ctx[:"contract.default"]
-  end
-
   def permit!(ctx, **)
     return [] if ctx[:current_user].blank?
 
