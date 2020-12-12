@@ -1,14 +1,10 @@
 class ApplicationError < StandardError
-  attr_reader :status
-
   def initialize(messages)
-    @status = status()
-    super(messages)
+    @status = status
+    super(messages.to_json)
   end
 
-  private
-
-    def status
-      raise NotImplementedError
-    end
+  def status
+    raise NotImplementedError
+  end
 end

@@ -13,8 +13,9 @@ module Panicboat
         yield
       rescue StandardError => e
         ActiveRecord::Rollback
-        status = e.kind_of?(ApplicationError) ? e.status : Rack::Utils::SYMBOL_TO_STATUS_CODE[:internal_server_error]
-        render status: status, json: { status: status, type: e.class.name, messages: JSON.parse(e.message) }
+        status = e.is_a?(ApplicationError) ? e.status : Rack::Utils::SYMBOL_TO_STATUS_CODE[:internal_server_error]
+        messages = JSON.parse(e.message) rescue e.message
+        render status: status, json: { status: status, type: e.class.name, messages: messages }
       end
     end
 
