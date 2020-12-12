@@ -55,6 +55,7 @@ class RequestProvider
 
   def throw(response)
     Rails.logger.warn '===== HTTP REQUEST ERROR ====='
-    raise ::HttpRequestError, { method: response.env.method, body: response.env.request_body, url: response.env.url }
+    body = JSON.parse(response.env.response_body) rescue response.env.response_body
+    raise ::HttpRequestError, { method: response.env.method, body: response.env.request_body, url: response.env.url, response: body }
   end
 end
