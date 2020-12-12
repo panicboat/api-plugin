@@ -35,7 +35,7 @@ class Panicboat::Operation < Trailblazer::Operation
   def _filter(permission, model, condition, key)
     permission.prn.each do |prn|
       search = prn.gsub(/\*/, '%')
-      sql = "CONCAT(\"prn:panicboat:#{ENV['AWS_ECS_CLUSTER_NAME']}:#{ENV['AWS_ECS_SERVICE_NAME']}:/\", #{key}) LIKE ?"
+      sql = "CONCAT(\"prn:panicboat:#{ENV['AWS_ECS_CLUSTER_NAME']}:#{ENV['AWS_ECS_SERVICE_NAME']}:#{model.name.downcase}/\", #{key}) LIKE ?"
       condition = if permission.effect == 'allow'
                     condition.or(model.where(sql, search))
                   else
