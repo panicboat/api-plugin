@@ -20,6 +20,8 @@ class Panicboat::Operation < Trailblazer::Operation
   end
 
   def filter(ctx, model, key)
+    return model.where('1=0') if ctx[:permissions].blank?
+
     condition = model.where('1=1')
     ctx[:permissions].each do |permission|
       condition = _filter(permission, model, condition, key) if permission.effect == 'allow'

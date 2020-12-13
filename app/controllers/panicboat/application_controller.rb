@@ -15,7 +15,7 @@ module Panicboat
         ActiveRecord::Rollback
         status = e.is_a?(ApplicationError) ? e.status : Rack::Utils::SYMBOL_TO_STATUS_CODE[:internal_server_error]
         messages = JSON.parse(e.message) rescue e.message
-        render status: status, json: { status: status, type: e.class.name, messages: messages }
+        render status: status, json: { status: status, type: e.class.name, messages: messages, trace: e.backtrace }
       end
     end
 
