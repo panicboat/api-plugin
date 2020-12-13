@@ -23,26 +23,26 @@ class Panicboat::Operation < Trailblazer::Operation
     raise ::InvalidPermissions, ["Permissions #{I18n.t('errors.messages.invalid')}"] if filter(ctx).blank?
   end
 
-  def filter(ctx, key = 'id')
+  def filter(ctx)
     model = ctx[:model].class
     return model.where('1=0') if ctx[:permissions].blank?
 
     condition = model.where('1=1')
     ctx[:permissions].each do |permission|
-      condition = _filter(permission, model, condition, key) if permission.effect == 'allow'
+      condition = _filter(permission, model, condition) if permission.effect == 'allow'
     end
     ctx[:permissions].each do |permission|
-      condition = _filter(permission, model, condition, key) if permission.effect == 'deny'
+      condition = _filter(permission, model, condition) if permission.effect == 'deny'
     end
     condition
   end
 
   private
 
-  def _filter(permission, model, condition, key)
+  def _filter(permission, model, condition)
     permission.prn.each do |prn|
       search = prn.gsub(/\*/, '%')
-      sql = "CONCAT(\"prn:panicboat:#{ENV['AWS_ECS_CLUSTER_NAME']}:#{ENV['AWS_ECS_SERVICE_NAME']}:#{model.name.downcase}/\", #{key}) LIKE ?"
+      sql = "CONCAT(\"prn:panicboat:#{ENV['AWS_ECS_CLUSTER_NAME']}:#{ENV['AWS_ECS_SERVICE_NAME']}:#{model.name.downcase}/\", #{model.primary_key}) LIKE ?"
       condition = if permission.effect == 'allow'
                     condition.or(model.where(sql, search))
                   else
