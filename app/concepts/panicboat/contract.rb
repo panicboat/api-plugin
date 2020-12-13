@@ -8,4 +8,5 @@ class Panicboat::Contract < Reform::Form
 
   FORMAT_UUID=/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
   FORMAT_EMAIL=/\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
+  FORMAT_URL=/\A#{URI::regexp(%w(http https))}\z/
 end

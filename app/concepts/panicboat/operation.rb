@@ -10,7 +10,7 @@ class Panicboat::Operation < Trailblazer::Operation
   end
 
   def permit!(ctx, **)
-    return [] if ctx[:current_user].blank?
+    raise ::InvalidPermissions, ["Permissions #{I18n.t('errors.messages.invalid')}"] if ctx[:current_user].blank?
 
     req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], ctx[:headers])
     permissions = req.get("/permissions/#{ctx[:action]}", {}).Permissions
