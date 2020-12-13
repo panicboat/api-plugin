@@ -19,6 +19,10 @@ class Panicboat::Operation < Trailblazer::Operation
     ctx[:permissions] = permissions
   end
 
+  def filter!(ctx, **)
+    raise ::InvalidPermissions, ["Permissions #{I18n.t('errors.messages.invalid')}"] if filter(ctx, ctx[:model].class, ctx[:model].class.primary_key).blank?
+  end
+
   def filter(ctx, model, key)
     return model.where('1=0') if ctx[:permissions].blank?
 
