@@ -21,6 +21,7 @@ class Panicboat::Operation < Trailblazer::Operation
 
   def filter!(ctx, **)
     raise ::InvalidPermissions, ["Permissions #{I18n.t('errors.messages.invalid')}"] if filter(ctx).blank?
+    ctx[:persist] = true
   end
 
   def filter(ctx)
