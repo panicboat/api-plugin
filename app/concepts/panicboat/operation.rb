@@ -19,28 +19,30 @@ class Panicboat::Operation < Trailblazer::Operation
     ctx[:permissions] = permissions
   end
 
-  def filter!(ctx, **)
-    raise ::InvalidPermissions, ["Permissions #{I18n.t('errors.messages.invalid')}"] if filter(ctx).blank?
-    ctx[:persist] = true
+  def scrape!(ctx, **)
+    model = scrape(ctx)
+    raise ::InvalidPermissions, ["Permissions #{I18n.t('errors.messages.invalid')}"] if model.blank?
+
+    ctx[:scraped] = model
   end
 
-  def filter(ctx)
+  def scrape(ctx)
     model = ctx[:model].class
     return model.where('1=0') if ctx[:permissions].blank?
 
     condition = model.where('1=1')
     ctx[:permissions].each do |permission|
-      condition = _filter(permission, model, condition) if permission.effect == 'allow'
+      condition = _scrape(permission, model, condition) if permission.effect == 'allow'
     end
     ctx[:permissions].each do |permission|
-      condition = _filter(permission, model, condition) if permission.effect == 'deny'
+      condition = _scrape(permission, model, condition) if permission.effect == 'deny'
     end
     condition
   end
 
   private
 
-  def _filter(permission, model, condition)
+  def _scrape(permission, model, condition)
     permission.prn.each do |prn|
       search = prn.gsub(/\*/, '%')
       sql = "CONCAT(\"prn:panicboat:#{ENV['AWS_ECS_CLUSTER_NAME']}:#{ENV['AWS_ECS_SERVICE_NAME']}:#{model.name.downcase}/\", #{model.primary_key}) LIKE ?"
