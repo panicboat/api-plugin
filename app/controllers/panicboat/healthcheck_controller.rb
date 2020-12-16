@@ -1,7 +1,7 @@
 module Panicboat
-  class HealthcheckController < ::ApplicationController
+  class HealthcheckController < ActionController::API
     def index
-      { status: Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok] }
+      render json: { status: Rack::Utils::SYMBOL_TO_STATUS_CODE[:ok] }
     end
   end
 end
