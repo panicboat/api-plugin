@@ -18,7 +18,7 @@ module Panicboat
               end
       req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], headers)
       req.get("/services/#{ENV['PNB_SERVICE_ID']}/actions", { name: name }).Actions.each do |act|
-        act.id if act.name == name
+        return act.id if act.name == name
       end
     end
 
