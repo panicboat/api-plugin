@@ -5,18 +5,20 @@ module Panicboat
     def _run_options(ctx)
       headers = ::RequestHeader.new(request.headers)
       ctx.merge!({ headers: headers })
-      ctx.merge!({ action: "#{ENV['AWS_ECS_SERVICE_NAME']}:#{_action}" })
+      ctx.merge!({ action: _action(headers, request.controller_class.to_s.gsub(/Controller$/, '').singularize, request.path_parameters[:action]) })
       ctx.merge!({ current_user: _session(headers) })
     end
 
-    def _action
-      controller = request.controller_class.to_s.gsub(/Controller$/, '').singularize
-      action = request.path_parameters[:action]
-      case action
-      when 'destroy' then "Delete#{controller.capitalize}"
-      when 'index' then "List#{controller.capitalize}"
-      when 'show' then "Get#{controller.capitalize}"
-      else "#{action.capitalize}#{controller.capitalize}"
+    def _action(headers, controller, action)
+      name =  case action
+              when 'destroy' then "Delete#{controller.capitalize}"
+              when 'index' then "List#{controller.capitalize}"
+              when 'show' then "Get#{controller.capitalize}"
+              else "#{action.capitalize}#{controller.capitalize}"
+              end
+      req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], headers)
+      req.get("/services/#{ENV['PNB_SERVICE_ID']}/actions", { name: name }).Actions.each do |act|
+        act.id
       end
     end
 

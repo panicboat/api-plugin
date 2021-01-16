@@ -13,7 +13,7 @@ class Panicboat::Operation < Trailblazer::Operation
     raise ::InvalidPermissions, ["Permissions #{I18n.t('errors.messages.invalid')}"] if ctx[:current_user].blank?
 
     req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], ctx[:headers])
-    permissions = req.get('/permissions/00000000-0000-0000-0000-000000000000', { service_action_name: ctx[:action] }).Permissions
+    permissions = req.get("/permissions/#{ctx[:action]}", {}).Permissions
     raise ::InvalidPermissions, ["Permissions #{I18n.t('errors.messages.invalid')}"] if permissions.blank?
 
     ctx[:permissions] = permissions
