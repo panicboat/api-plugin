@@ -17,9 +17,10 @@ module Panicboat
               else "#{action.capitalize}#{controller.capitalize}"
               end
       req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], headers)
-      req.get("/services/#{ENV['PNB_SERVICE_ID']}/actions", { name: name }).Actions.each do |act|
-        return act.id if act.name == name
-      end
+      model = req.get("/services/#{ENV['PNB_SERVICE_ID']}/actions", { name: name }).Actions
+      return nil if model.blank?
+
+      model[0].id
     end
 
     def _session(headers)
