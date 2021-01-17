@@ -17,10 +17,7 @@ module Panicboat
               else "#{action.capitalize}#{controller.capitalize}"
               end
       req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], headers)
-      model = req.get("/services/#{ENV['PNB_SERVICE_ID']}/actions", { name: name }).Actions
-      return nil if model.blank?
-
-      model[0].id
+      _action_id(req, _service_id(req))
     end
 
     def _session(headers)
@@ -34,6 +31,29 @@ module Panicboat
       return nil if users.blank?
 
       users.first
+    end
+
+
+    def _service_id(req)
+      services = Rails.cache.fetch('ListService') do
+        req.get("/services/", {}).Services
+      end
+      model = services.select{ |item| item.name == name }
+      return nil if model.blank?
+
+      model[0].id
+    end
+
+    def _action_id(req, service_id)
+      return nil if service_id.blank?
+
+      actions = Rails.cache.fetch('ListAction') do
+        req.get("/services/#{service_id}/actions", {}).Actions
+      end
+      model = actions.select{ |item| item.name == name }
+      return nil if model.blank?
+
+      model[0].id
     end
   end
 end
