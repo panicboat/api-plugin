@@ -33,12 +33,11 @@ module Panicboat
       users.first
     end
 
-
     def _service_id(req)
       services = Rails.cache.fetch('ListService') do
-        req.get("/services/", {}).Services
+        req.get('/services/', {}).Services
       end
-      model = services.select{ |item| item.name == name }
+      model = services.select { |item| item.name == ENV['AWS_ECS_SERVICE_NAME'] }
       return nil if model.blank?
 
       model[0].id
