@@ -17,7 +17,7 @@ module Panicboat
               else "#{action.capitalize}#{controller.capitalize}"
               end
       req = ::RequestProvider.new(ENV['HTTP_IAM_URL'], headers)
-      _action_id(req, _service_id(req))
+      _action_id(req, _service_id(req), name)
     end
 
     def _session(headers)
@@ -44,7 +44,7 @@ module Panicboat
       model[0].id
     end
 
-    def _action_id(req, service_id)
+    def _action_id(req, service_id, name)
       return nil if service_id.blank?
 
       actions = Rails.cache.fetch('ListAction') do
