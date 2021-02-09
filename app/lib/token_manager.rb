@@ -1,9 +1,9 @@
 require 'net/http'
 
 class TokenManager
-  def initialize(aws_cognito_userpool_id, jwt)
+  def initialize(jwt)
     @jwt = jwt
-    @url = "https://cognito-idp.#{ENV['AWS_DEFAULT_REGION']}.amazonaws.com/#{aws_cognito_userpool_id}"
+    @url = "https://cognito-idp.#{ENV['AWS_DEFAULT_REGION']}.amazonaws.com/#{ENV['AWS_COGNITO_USERPOOL_ID']}"
     @payload = ::JWT.decode(jwt, nil, false)
   end
 
